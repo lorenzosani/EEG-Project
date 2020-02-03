@@ -214,7 +214,13 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="#ffffffff"
                 android:textSize="20dp" />
-            
+               <Button
+                android:id="@+id/btn_selectdevice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Device"
+                 android:textColor="#ffffffff"
+                android:textSize="16dp" />
         </TableRow>
          <TableRow
             android:id="@+id/tableRow4"

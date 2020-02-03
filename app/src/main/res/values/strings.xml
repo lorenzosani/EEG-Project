@@ -1,4 +1,5 @@
 <resources>
-    <string name="app_name">Project-App</string>
-    <string name="action_settings">Settings</string>
+
+    <string name="app_name">TGStreamDemo_MindWaveMobile</string>
+
 </resources>
