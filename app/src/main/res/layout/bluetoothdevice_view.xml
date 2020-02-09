@@ -4,23 +4,23 @@
     android:id="@+id/AbsoluteLayout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ff000000"
-    android:orientation="vertical" >
+    android:background="#141414"
+    android:orientation="vertical">
 
-       <TableLayout
+    <TableLayout
         android:id="@+id/tableLayout1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_marginTop="17dp"
-        android:stretchColumns="*" >
+        android:stretchColumns="*">
 
         <TableRow
             android:id="@+id/tableRow1"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
-            
+            android:layout_height="wrap_content">
+
             <TextView
                 android:id="@+id/tv_ps_lable"
                 android:layout_width="wrap_content"
@@ -60,7 +60,6 @@
                 android:textSize="20dp" />
 
 
-
             <TextView
                 android:id="@+id/tv_meditation_label"
                 android:layout_width="wrap_content"
@@ -78,23 +77,14 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="#ffffffff"
                 android:textSize="20dp" />
-
-            <Button
-                android:id="@+id/btn_start"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical|center_horizontal|center"
-                android:text="Start"
-                 android:textColor="#ffffffff"
-                android:textSize="16dp" />
         </TableRow>
 
         <TableRow
             android:id="@+id/tableRow2"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
-            
-             <TextView
+            android:layout_height="wrap_content">
+
+            <TextView
                 android:id="@+id/tv_delta_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -148,21 +138,13 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="#ffffffff"
                 android:textSize="20dp" />
-        			
 
-            <Button
-                android:id="@+id/btn_stop"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Stop"
-                 android:textColor="#ffffffff"
-                android:textSize="16dp" />
         </TableRow>
 
         <TableRow
             android:id="@+id/tableRow3"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/tv_highalpha_label"
@@ -180,6 +162,7 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="#ffffffff"
                 android:textSize="20dp" />
+
             <TextView
                 android:id="@+id/tv_lowbeta_label"
                 android:layout_width="wrap_content"
@@ -214,18 +197,13 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="#ffffffff"
                 android:textSize="20dp" />
-               <Button
-                android:id="@+id/btn_selectdevice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Device"
-                 android:textColor="#ffffffff"
-                android:textSize="16dp" />
+
         </TableRow>
-         <TableRow
+
+        <TableRow
             android:id="@+id/tableRow4"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/tv_lowgamma_label"
@@ -243,6 +221,7 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="#ffffffff"
                 android:textSize="20dp" />
+
             <TextView
                 android:id="@+id/tv_middlegamma_label"
                 android:layout_width="wrap_content"
@@ -259,7 +238,7 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="#ffffffff"
                 android:textSize="20dp" />
-            
+
             <TextView
                 android:id="@+id/tv_badpacket_label"
                 android:layout_width="wrap_content"
@@ -277,22 +256,77 @@
                 android:textColor="#ffffffff"
                 android:textSize="20dp" />
 
-            
+
         </TableRow>
     </TableLayout>
-    
-    <!-- drawing with view.  -->
+
     <LinearLayout
         android:id="@+id/wave_layout"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/buttons"
+        android:layout_below="@+id/tableLayout1"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:background="@xml/sharp"
+        android:orientation="vertical">
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/buttons"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/tableLayout1"
-        android:background="@xml/sharp"
-        android:orientation="vertical" >
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:padding="8dp">
 
+        <Button
+            android:id="@+id/btn_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/btn_bg"
+            android:gravity="center_horizontal|center_vertical"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:text="Start"
+            android:textAlignment="center"
+            android:textColor="#ffffffff"
+            android:textSize="16dp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/btn_bg"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:text="Stop"
+            android:textColor="#ffffffff"
+            android:textSize="16dp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_selectdevice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/btn_bg"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:text="Device"
+            android:textColor="#ffffffff"
+            android:textSize="16dp"
+            android:textStyle="bold" />
     </LinearLayout>
 
 </RelativeLayout>

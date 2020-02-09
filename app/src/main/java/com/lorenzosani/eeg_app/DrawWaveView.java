@@ -77,7 +77,7 @@ public class DrawWaveView extends View {
 		cacheCanvas.setBitmap(cacheBitmap);
 		
 		paint = new Paint(Paint.DITHER_FLAG);
-		paint.setColor(Color.GREEN);
+		paint.setColor(Color.parseColor("#449C64"));
 		paint.setStyle(Paint.Style.STROKE);
 		paint.setStrokeWidth(4);
 		
