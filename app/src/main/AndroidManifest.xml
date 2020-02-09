@@ -25,12 +25,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.lorenzosani.eeg_app.BluetoothAdapterDemoActivity"
-            android:screenOrientation="landscape"/>
          <activity android:name="com.lorenzosani.eeg_app.BluetoothDeviceDemoActivity"
-             android:screenOrientation="landscape"/>
-          <activity android:name="com.lorenzosani.eeg_app.FileDemoActivity"
-              android:screenOrientation="landscape"/>
+             android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

@@ -1,84 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/Layout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ff000000"
-    android:orientation="vertical" >
+    android:background="#141414"
+    android:gravity="bottom"
+    android:orientation="vertical">
 
-        <TextView
-                android:id="@+id/tv_filedemo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="TgStreamReader(InputStream is, TgStreamHandler handler) \n Only support binary file with the format 'AA AA XX XX … Checksum' that generate by MWM"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textColor="#ffffffff"
-                android:textSize="16sp" />
-        			
 
-            <Button
-                android:id="@+id/btn_filedemo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="File Demo"
-                 android:textColor="#ffffffff"
-                android:textSize="16dp" />
-            
-                    <TextView
-                android:id="@+id/tv_adapter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="TgStreamReader(BluetoothAdapter ba, TgStreamHandler handler) \n You have to pair the device and phone before call it.  "
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textColor="#ffffffff"
-                android:textSize="16sp" />
-        			
+    <TextView
+        android:id="@+id/welcome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="48dp"
+        android:capitalize="characters"
+        android:lineSpacingExtra="4sp"
+        android:paddingBottom="120dp"
+        android:text="Hey! Welcome to my final-year project!"
+        android:textAlignment="textStart"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:textColor="#449C64"
+        android:textSize="32dp"
+        android:textStyle="bold" />
 
-            <Button
-                android:id="@+id/btn_adapter"
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="-48dp"
+        app:cardBackgroundColor="#202020"
+        app:cardCornerRadius="48dp">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="24dp">
+
+            <EditText
+                android:id="@+id/ready"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="BluetoothAdapter Demo"
-                 android:textColor="#ffffffff"
-                android:textSize="16dp" />
-            
-               <TextView
-                android:id="@+id/tv_device"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="TgStreamReader(BluetoothDevice bd, TgStreamHandler handler) \n When use this constructor , you can implement the change band function without exiting the app.  "
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textColor="#ffffffff"
-                android:textSize="16sp" />
-        			
+                android:layout_marginBottom="8dp"
+                android:text="Are you ready?"
+                android:textColor="#6F6F6F"
+                android:textSize="14dp" />
 
             <Button
                 android:id="@+id/btn_device"
-                android:layout_width="wrap_content"
+                style="@style/Widget.AppCompat.Button"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="BluetoothDevice Demo"
-                 android:textColor="#ffffffff"
-                android:textSize="16dp" />
-            
-            <!-- There is no uart mind device -->
-            <!-- 
-            <TextView
-                android:id="@+id/tv_uart"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="TgStreamReader(String devName ,TgStreamHandler handler) \n The string parameter devName indicates a serial port name( linux device file name). Our sensor should embed into phone or other board that can connect by UART. "
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textColor="#ffffffff"
-                android:textSize="16sp" />
-        			
+                android:layout_below="@id/ready"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="60dp"
+                android:background="@drawable/btn_bg"
+                android:text="Get Started"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="#E6FFFFFF"
+                android:textSize="18dp"
+                android:textStyle="bold" />
 
-            <Button
-                android:id="@+id/btn_uart"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="UART Demo"
-                 android:textColor="#ffffffff"
-                android:textSize="16dp" />
-        -->
+        </RelativeLayout>
+
+    </androidx.cardview.widget.CardView>
+
 </LinearLayout>

@@ -294,18 +294,5 @@
         android:orientation="vertical" >
 
     </LinearLayout>
-    
-    <!--  drawing with achart
-   	<LinearLayout
-    	android:id="@+id/wave_layout"
-     
-        android:layout_width="@dimen/lin_width"
-        android:layout_height="@dimen/lin_height"
-        android:layout_below="@+id/tableLayout1"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:orientation="vertical">
- 	</LinearLayout>
- 	-->
+
 </RelativeLayout>
