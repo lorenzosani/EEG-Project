@@ -1,33 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/BaseLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        android:src="@drawable/img_bg"></ImageView>
+
+<RelativeLayout
     android:id="@+id/Layout1"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#141414"
-    android:gravity="bottom"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
 
-    <TextView
-        android:id="@+id/welcome"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="48dp"
-        android:capitalize="characters"
-        android:lineSpacingExtra="4sp"
-        android:paddingBottom="120dp"
-        android:text="Hey! Welcome to my final-year project!"
-        android:textAlignment="textStart"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-        android:textColor="#449C64"
-        android:textSize="32dp"
-        android:textStyle="bold" />
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="48dp"
+        android:padding="48dp">
+
+        <TextView
+            android:id="@+id/welcome"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:capitalize="characters"
+            android:lineSpacingExtra="4sp"
+            android:text="Hey! Ready to control music with your mind?"
+            android:textAlignment="textStart"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:textColor="#449C64"
+            android:textSize="32dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/welcome2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/welcome"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="16dp"
+            android:capitalize="characters"
+            android:text="1. Turn on your Bluetooth"
+            android:textAlignment="textStart"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:textColor="#CFFFFFFF"
+            android:textSize="16dp" />
+
+        <TextView
+            android:id="@+id/welcome3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/welcome2"
+            android:layout_marginBottom="16dp"
+            android:capitalize="characters"
+            android:lineSpacingExtra="4sp"
+            android:text='2. Press "Get Started" when ready'
+            android:textAlignment="textStart"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:textColor="#CFFFFFFF"
+            android:textSize="16dp" />
+    </RelativeLayout>
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:layout_marginBottom="-48dp"
         app:cardBackgroundColor="#202020"
         app:cardCornerRadius="48dp">
@@ -37,21 +81,11 @@
             android:layout_height="wrap_content"
             android:padding="24dp">
 
-            <EditText
-                android:id="@+id/ready"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="Are you ready?"
-                android:textColor="#6F6F6F"
-                android:textSize="14dp" />
-
             <Button
                 android:id="@+id/btn_device"
                 style="@style/Widget.AppCompat.Button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/ready"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="60dp"
                 android:background="@drawable/btn_bg"
@@ -65,4 +99,5 @@
 
     </androidx.cardview.widget.CardView>
 
-</LinearLayout>
+</RelativeLayout>
+</RelativeLayout>
