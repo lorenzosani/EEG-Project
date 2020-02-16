@@ -32,11 +32,14 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 /**
  * This activity demonstrates how to use the constructor:
@@ -47,7 +50,7 @@ import android.widget.AdapterView.OnItemClickListener;
  * (3) Demo of getting Bluetooth device dynamically
  * (4) setTgStreamHandler
  */
-public class BluetoothDeviceDemoActivity extends Activity {
+public class BluetoothDeviceDemoActivity extends AppCompatActivity {
 	private static final String TAG = BluetoothDeviceDemoActivity.class.getSimpleName();
 	private TgStreamReader tgStreamReader;
 	
@@ -85,20 +88,19 @@ public class BluetoothDeviceDemoActivity extends Activity {
 		}
 	}
 
-	private TextView tv_ps = null;
+	private ImageView track_cover;
+	private TextView track_title;
+	private ImageView track_previous;
+	private ImageView track_play_pause;
+	private ImageView track_next;
+
 	private TextView tv_attention = null;
 	private TextView tv_meditation = null;
-	private TextView tv_delta = null;
-	private TextView tv_theta = null;
 	private TextView tv_lowalpha = null;
 	
 	private TextView  tv_highalpha = null;
 	private TextView  tv_lowbeta = null;
 	private TextView  tv_highbeta = null;
-	
-	private TextView  tv_lowgamma = null;
-	private TextView  tv_middlegamma  = null;
-	private TextView  tv_badpacket = null;
 	
 	private Button btn_start = null;
 	private Button btn_stop = null;
@@ -108,21 +110,19 @@ public class BluetoothDeviceDemoActivity extends Activity {
 	private int badPacketCount = 0;
 
 	private void initView() {
-		tv_ps = (TextView) findViewById(R.id.tv_ps);
+		track_cover = (ImageView) findViewById(R.id.track_cover);
+		track_title = (TextView) findViewById(R.id.track_title);
+		track_previous = (ImageView) findViewById(R.id.track_previous);
+		track_play_pause = (ImageView) findViewById(R.id.track_play_pause);
+		track_next = (ImageView) findViewById(R.id.track_next);
+
 		tv_attention = (TextView) findViewById(R.id.tv_attention);
 		tv_meditation = (TextView) findViewById(R.id.tv_meditation);
-		tv_delta = (TextView) findViewById(R.id.tv_delta);
-		tv_theta = (TextView) findViewById(R.id.tv_theta);
 		tv_lowalpha = (TextView) findViewById(R.id.tv_lowalpha);
 		
 		tv_highalpha = (TextView) findViewById(R.id.tv_highalpha);
 		tv_lowbeta= (TextView) findViewById(R.id.tv_lowbeta);
 		tv_highbeta= (TextView) findViewById(R.id.tv_highbeta);
-		
-		tv_lowgamma = (TextView) findViewById(R.id.tv_lowgamma);
-		tv_middlegamma= (TextView) findViewById(R.id.tv_middlegamma);
-		tv_badpacket = (TextView) findViewById(R.id.tv_badpacket);
-		
 		
 		btn_start = (Button) findViewById(R.id.btn_start);
 		btn_stop = (Button) findViewById(R.id.btn_stop);
@@ -363,24 +363,19 @@ public class BluetoothDeviceDemoActivity extends Activity {
 			case MindDataType.CODE_EEGPOWER:
 				EEGPower power = (EEGPower)msg.obj;
 				if(power.isValidate()){
-					tv_delta.setText("" +power.delta);
-					tv_theta.setText("" +power.theta);
 					tv_lowalpha.setText("" +power.lowAlpha);
 					tv_highalpha.setText("" +power.highAlpha);
 					tv_lowbeta.setText("" +power.lowBeta);
 					tv_highbeta.setText("" +power.highBeta);
-					tv_lowgamma.setText("" +power.lowGamma);
-					tv_middlegamma.setText("" +power.middleGamma);
 				}
 				break;
 			case MindDataType.CODE_POOR_SIGNAL://
 				int poorSignal = msg.arg1;
 				Log.d(TAG, "poorSignal:" + poorSignal);
-				tv_ps.setText(""+msg.arg1);
 
 				break;
 			case MSG_UPDATE_BAD_PACKET:
-				tv_badpacket.setText("" + msg.arg1);
+				Log.d(TAG, "badPacket:" + msg.arg1);
 				
 				break;
 			default:

@@ -9,23 +9,7 @@
         android:layout_height="25dp" 
         android:layout_marginTop="5dp" 
         android:layout_marginBottom="5dp" 
-        android:layout_marginLeft="3dp" >
-
-        <ImageView
-            android:id="@+id/img1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:src="@drawable/gouxuan1" />
-
-        <ImageView
-            android:id="@+id/img2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:src="@drawable/gouxuan2"
-            android:visibility="gone" />
-    </RelativeLayout>
+        android:layout_marginLeft="3dp" />
 
     <TextView
         android:id="@+id/device_name"

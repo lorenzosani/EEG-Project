@@ -89,7 +89,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="60dp"
                 android:background="@drawable/btn_bg"
-                android:text="Get Started"
+                android:text="GET STARTED"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 android:textColor="#E6FFFFFF"
                 android:textSize="18dp"
