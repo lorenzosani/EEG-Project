@@ -3,8 +3,11 @@ package com.lorenzosani.eeg_app;
 
 import com.neurosky.connection.TgStreamReader;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -12,6 +15,9 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 /**
  * This activity is the man entry of this app. It demonstrates the usage of 
@@ -30,14 +36,24 @@ public class DemoActivity extends Activity {
 		setContentView(R.layout.main_view);
 
 		initView();
-		// (1) Example of redirectConsoleLogToDocumentFolder()
-		// Call redirectConsoleLogToDocumentFolder at the beginning of the app, it will record all the log.
-		// Call redirectConsoleLogToDocumentFolder at the beginning of the app, it will record all the log.
-		// Don't forget to call stopConsoleLog() in onDestroy() if it is the end point of this app.
-		// If you can't find the end point of the app , you don't have to call stopConsoleLog()
+
 		TgStreamReader.redirectConsoleLogToDocumentFolder();
-		// (3) demo of getVersion
+
 		Log.d(TAG,"lib version: " + TgStreamReader.getVersion());
+
+		// Ask permission to read storage to get available songs
+		if (ContextCompat.checkSelfPermission(DemoActivity.this,
+				Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+			if (ActivityCompat.shouldShowRequestPermissionRationale(DemoActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+				ActivityCompat.requestPermissions(DemoActivity.this,
+						new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+
+			} else {
+				ActivityCompat.requestPermissions(DemoActivity.this,
+						new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+
+			}
+		}
 	}
 
 	private Button btn_device = null;

@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.lorenzosani.eeg_app"
-    android:versionCode="1"
-    android:versionName="1.0" >
+    package="com.lorenzosani.eeg_app">
 
-    <uses-sdk
-        android:targetSdkVersion="19" />
 	<uses-permission android:name="android.permission.BLUETOOTH" />
 	<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-	<uses-permission android:name="android.permission.MOUNT_FORMAT_FILESYSTEMS"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -24,10 +20,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-         <activity
+        <activity
              android:name="com.lorenzosani.eeg_app.BluetoothDeviceDemoActivity"
              android:screenOrientation="portrait"
              android:theme="@style/fullscreen"/>
+        <service android:name=".MusicService"/>
     </application>
 
 </manifest>

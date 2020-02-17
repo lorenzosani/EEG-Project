@@ -1,6 +1,7 @@
 package com.lorenzosani.eeg_app;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Set;
 
 import com.neurosky.connection.ConnectionStates;
@@ -10,18 +11,22 @@ import com.neurosky.connection.TgStreamReader;
 import com.neurosky.connection.DataType.MindDataType;
 import com.neurosky.connection.DataType.MindDataType.FilterType;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.DialogInterface.OnCancelListener;
+import android.content.ServiceConnection;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
@@ -39,25 +44,22 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
+import androidx.annotation.DrawableRes;
 import androidx.appcompat.app.AppCompatActivity;
 
-/**
- * This activity demonstrates how to use the constructor:
- * public TgStreamReader(BluetoothDevice mBluetoothDevice,TgStreamHandler tgStreamHandler)
- * and related functions:
- * (1) changeBluetoothDevice
- * (2) Demo of drawing ECG
- * (3) Demo of getting Bluetooth device dynamically
- * (4) setTgStreamHandler
- */
 public class BluetoothDeviceDemoActivity extends AppCompatActivity {
+
 	private static final String TAG = BluetoothDeviceDemoActivity.class.getSimpleName();
 	private TgStreamReader tgStreamReader;
-	
-	// TODO connection sdk
 	private BluetoothAdapter mBluetoothAdapter;
 	private BluetoothDevice mBluetoothDevice;
 	private String address = null;
+
+	private ArrayList<Song> songList;
+	private int currentSong = 0;
+	private MusicService musicSrv;
+	private Intent playIntent;
+	private boolean musicBound=false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -66,11 +68,11 @@ public class BluetoothDeviceDemoActivity extends AppCompatActivity {
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		setContentView(R.layout.bluetoothdevice_view);
 
+		getSongList();
 		initView();
 		setUpDrawWaveView();
 
 		try {
-			// TODO	
 			mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 			if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
 				Toast.makeText(
@@ -78,17 +80,32 @@ public class BluetoothDeviceDemoActivity extends AppCompatActivity {
 						"Please enable your Bluetooth and re-run this program !",
 						Toast.LENGTH_LONG).show();
 				finish();
-//				return;
 			}  
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			Log.i(TAG, "error:" + e.getMessage());
 			return;
 		}
 	}
 
-	private ImageView track_cover;
+	private ServiceConnection musicConnection = new ServiceConnection(){
+
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			MusicService.MusicBinder binder = (MusicService.MusicBinder) service;
+			//get service
+			musicSrv = binder.getService();
+			//pass list
+			musicSrv.setList(songList);
+			musicBound = true;
+		}
+
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+			musicBound = false;
+		}
+	};
+
 	private TextView track_title;
 	private ImageView track_previous;
 	private ImageView track_play_pause;
@@ -110,7 +127,6 @@ public class BluetoothDeviceDemoActivity extends AppCompatActivity {
 	private int badPacketCount = 0;
 
 	private void initView() {
-		track_cover = (ImageView) findViewById(R.id.track_cover);
 		track_title = (TextView) findViewById(R.id.track_title);
 		track_previous = (ImageView) findViewById(R.id.track_previous);
 		track_play_pause = (ImageView) findViewById(R.id.track_play_pause);
@@ -126,6 +142,7 @@ public class BluetoothDeviceDemoActivity extends AppCompatActivity {
 		
 		btn_start = (Button) findViewById(R.id.btn_start);
 		btn_stop = (Button) findViewById(R.id.btn_stop);
+		btn_selectdevice =  (Button) findViewById(R.id.btn_selectdevice);
 		wave_layout = (LinearLayout) findViewById(R.id.wave_layout);
 		
 		btn_start.setOnClickListener(new OnClickListener() {
@@ -142,25 +159,58 @@ public class BluetoothDeviceDemoActivity extends AppCompatActivity {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				if(tgStreamReader != null){
 					tgStreamReader.stop();
 				}
 			}
 
 		});
-		
-		btn_selectdevice =  (Button) findViewById(R.id.btn_selectdevice);
-		
+
+		track_play_pause.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				if (musicSrv.isPng()){
+					musicSrv.pausePlayer();
+					track_play_pause.setImageResource(R.drawable.ic_play);
+				} else {
+					musicSrv.playSong(currentSong);
+					track_play_pause.setImageResource(R.drawable.ic_pause);
+				}
+			}
+
+		});
+
+		track_previous.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				goToSong(-1);
+			}
+
+		});
+
+		track_next.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				goToSong(1);
+			}
+
+		});
+
 		btn_selectdevice.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				scanDevice();
 			}
 
 		});
+
+		// Set the first song to be displayed in the player
+		Song firstSong = songList.get(currentSong);
+		track_title.setText(firstSong.getTitle() + " by " + firstSong.getArtist());
 	}
 	
 	private void start(){
@@ -195,6 +245,11 @@ public class BluetoothDeviceDemoActivity extends AppCompatActivity {
 	@Override
 	protected void onStart() {
 		super.onStart();
+		if(playIntent==null){
+			playIntent = new Intent(this, MusicService.class);
+			bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
+			startService(playIntent);
+		}
 	}
 
 	@Override
@@ -483,13 +538,7 @@ public class BluetoothDeviceDemoActivity extends AppCompatActivity {
 		}
 	
  };
- 
- /**
-	 * If the TgStreamReader is created, just change the bluetooth
-	 * else create TgStreamReader, set data receiver, TgStreamHandler and parser
-	 * @param bd
-	 * @return TgStreamReader
-	 */
+
 	public TgStreamReader createStreamReader(BluetoothDevice bd){
 
 		if(tgStreamReader == null){
@@ -505,12 +554,8 @@ public class BluetoothDeviceDemoActivity extends AppCompatActivity {
 		}
 		return tgStreamReader;
 	}
- 
- /**
-  * Check whether the given device is bonded, if not, bond it 
-  * @param bd
-  */
- public void bindToDevice(BluetoothDevice bd){
+
+ 	public void bindToDevice(BluetoothDevice bd){
  	    int ispaired = 0;
 		if(bd.getBondState() != BluetoothDevice.BOND_BONDED){
 			//ispaired = remoteDevice.createBond();
@@ -535,8 +580,7 @@ public class BluetoothDeviceDemoActivity extends AppCompatActivity {
 		Log.d(TAG, " ispaired:    " + ispaired);	
 
  }
- 
-//The BroadcastReceiver that listens for discovered devices 
+
 	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -551,8 +595,51 @@ public class BluetoothDeviceDemoActivity extends AppCompatActivity {
 				// update to UI
 				deviceListApapter.addDevice(device);
 				deviceListApapter.notifyDataSetChanged();
-
 			} 
 		}
 	};
+
+	public void getSongList() {
+		songList = new ArrayList<Song>();
+		ContentResolver musicResolver = getContentResolver();
+		Cursor musicCursor = musicResolver.query(android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null, null, null, null);
+
+		if(musicCursor!=null && musicCursor.moveToFirst()){
+			//get columns
+			int titleColumn = musicCursor.getColumnIndex
+					(android.provider.MediaStore.Audio.Media.TITLE);
+			int idColumn = musicCursor.getColumnIndex
+					(android.provider.MediaStore.Audio.Media._ID);
+			int artistColumn = musicCursor.getColumnIndex
+					(android.provider.MediaStore.Audio.Media.ARTIST);
+			//add songs to list
+			do {
+				long thisId = musicCursor.getLong(idColumn);
+				String thisTitle = musicCursor.getString(titleColumn);
+				String thisArtist = musicCursor.getString(artistColumn);
+				if (!thisTitle.startsWith("Voice")){
+					songList.add(new Song(thisId, thisTitle, thisArtist));
+				}
+			}
+			while (musicCursor.moveToNext());
+		}
+	}
+
+	public void goToSong(int i){
+		Song s;
+		currentSong+=i;
+		try{
+			s = songList.get(currentSong);
+		}catch(IndexOutOfBoundsException e){
+			if(i>0){
+				currentSong = 0;
+			}else{
+				currentSong = songList.size()-1;
+			}
+			s = songList.get(currentSong);
+		}
+		track_title.setText(s.getTitle() + " by " + s.getArtist());
+		musicSrv.playSong(currentSong);
+		track_play_pause.setImageResource(R.drawable.ic_pause);
+	}
 }
