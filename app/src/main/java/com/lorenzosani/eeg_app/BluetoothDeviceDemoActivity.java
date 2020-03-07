@@ -1,8 +1,6 @@
 package com.lorenzosani.eeg_app;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Set;
 
 import com.neurosky.connection.ConnectionStates;
 import com.neurosky.connection.EEGPower;
@@ -11,17 +9,12 @@ import com.neurosky.connection.TgStreamReader;
 import com.neurosky.connection.DataType.MindDataType;
 import com.neurosky.connection.DataType.MindDataType.FilterType;
 
-import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.DialogInterface.OnCancelListener;
 import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -32,19 +25,14 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
-import android.view.LayoutInflater;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
 
-import androidx.annotation.DrawableRes;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class BluetoothDeviceDemoActivity extends AppCompatActivity {
@@ -52,14 +40,15 @@ public class BluetoothDeviceDemoActivity extends AppCompatActivity {
 	private static final String TAG = BluetoothDeviceDemoActivity.class.getSimpleName();
 	private TgStreamReader tgStreamReader;
 	private BluetoothAdapter mBluetoothAdapter;
-	private BluetoothDevice mBluetoothDevice;
-	private String address = null;
 
 	private ArrayList<Song> songList;
 	private int currentSong = 0;
 	private MusicService musicSrv;
 	private Intent playIntent;
 	private boolean musicBound=false;
+
+	private ArrayList<Integer> recentAttentionLvl = new ArrayList<>();
+	private int averageAttention;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -203,7 +192,7 @@ public class BluetoothDeviceDemoActivity extends AppCompatActivity {
 
 			@Override
 			public void onClick(View arg0) {
-				scanDevice();
+				start();
 			}
 
 		});
@@ -214,14 +203,8 @@ public class BluetoothDeviceDemoActivity extends AppCompatActivity {
 	}
 	
 	private void start(){
-		if(address != null){
-			BluetoothDevice bd = mBluetoothAdapter.getRemoteDevice(address);
-			createStreamReader(bd);
-
+			createStreamReader(mBluetoothAdapter);
 			tgStreamReader.connectAndStart();
-		}else{
-			showToast("Please select device first!", Toast.LENGTH_SHORT);
-		}
 	}
 
 	public void stop() {
@@ -234,7 +217,6 @@ public class BluetoothDeviceDemoActivity extends AppCompatActivity {
 
 	@Override
 	protected void onDestroy() {
-		// TODO Auto-generated method stub
 		if(tgStreamReader != null){
 			tgStreamReader.close();
 			tgStreamReader = null;
@@ -254,14 +236,10 @@ public class BluetoothDeviceDemoActivity extends AppCompatActivity {
 
 	@Override
 	protected void onStop() {
-		// TODO Auto-generated method stub
 		super.onStop();
 		stop();
 	}
-
-	// TODO view
 	DrawWaveView waveView = null;
-	// (2) demo of drawing ECG, set up of view
 	public void setUpDrawWaveView() {
 		
 		waveView = new DrawWaveView(getApplicationContext());
@@ -269,7 +247,6 @@ public class BluetoothDeviceDemoActivity extends AppCompatActivity {
 				LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 		waveView.setValue(2048, 2048, -2048);
 	}
-	// (2) demo of drawing ECG, update view
 	public void updateWaveView(int data) {
 		if (waveView != null) {
 			waveView.updateData(data);
@@ -280,7 +257,6 @@ public class BluetoothDeviceDemoActivity extends AppCompatActivity {
 
 		@Override
 		public void onStatesChanged(int connectionStates) {
-			// TODO Auto-generated method stub
 			Log.d(TAG, "connectionStates change to: " + connectionStates);
 			currentState  = connectionStates;
 			switch (connectionStates) {
@@ -289,13 +265,10 @@ public class BluetoothDeviceDemoActivity extends AppCompatActivity {
 				showToast("Connected", Toast.LENGTH_SHORT);
 				break;
 			case ConnectionStates.STATE_WORKING:
-				//byte[] cmd = new byte[1];
-				//cmd[0] = 's';
-				//tgStreamReader.sendCommandtoDevice(cmd);
 				LinkDetectedHandler.sendEmptyMessageDelayed(1234, 5000);
 				break;
 			case ConnectionStates.STATE_GET_DATA_TIME_OUT:
-				//get data time out
+				showToast("No data received", Toast.LENGTH_SHORT);
 				break;
 			case ConnectionStates.STATE_COMPLETE:
 				//read file complete
@@ -321,43 +294,35 @@ public class BluetoothDeviceDemoActivity extends AppCompatActivity {
 
 		@Override
 		public void onRecordFail(int a) {
-			// TODO Auto-generated method stub
 			Log.e(TAG,"onRecordFail: " +a);
 
 		}
 
 		@Override
 		public void onChecksumFail(byte[] payload, int length, int checksum) {
-			// TODO Auto-generated method stub
-			
 			badPacketCount ++;
 			Message msg = LinkDetectedHandler.obtainMessage();
 			msg.what = MSG_UPDATE_BAD_PACKET;
 			msg.arg1 = badPacketCount;
 			LinkDetectedHandler.sendMessage(msg);
-
 		}
 
 		@Override
 		public void onDataReceived(int datatype, int data, Object obj) {
-			// TODO Auto-generated method stub
 			Message msg = LinkDetectedHandler.obtainMessage();
 			msg.what = datatype;
 			msg.arg1 = data;
 			msg.obj = obj;
 			LinkDetectedHandler.sendMessage(msg);
-			//Log.i(TAG,"onDataReceived");
 		}
 
 	};
 
-	private boolean isPressing = false;
 	private static final int MSG_UPDATE_BAD_PACKET = 1001;
 	private static final int MSG_UPDATE_STATE = 1002;
 	private static final int MSG_CONNECT = 1003;
 	private boolean isReadFilter = false;
 
-	int raw;
 	private Handler LinkDetectedHandler = new Handler() {
 
 		@Override
@@ -414,8 +379,9 @@ public class BluetoothDeviceDemoActivity extends AppCompatActivity {
 			case MindDataType.CODE_ATTENTION:
 				Log.d(TAG, "CODE_ATTENTION " + msg.arg1);
 				tv_attention.setText("" +msg.arg1 );
+				if (msg.arg1 > 0){ updateAverageAttention(msg.arg1); }
 				break;
-			case MindDataType.CODE_EEGPOWER:
+				case MindDataType.CODE_EEGPOWER:
 				EEGPower power = (EEGPower)msg.obj;
 				if(power.isValidate()){
 					tv_lowalpha.setText("" +power.lowAlpha);
@@ -440,6 +406,31 @@ public class BluetoothDeviceDemoActivity extends AppCompatActivity {
 		}
 	};
 
+	private void updateAverageAttention(int attention) {
+		recentAttentionLvl.add(attention);
+		int length = recentAttentionLvl.size();
+		int sum = 0;
+
+		if (length >= 6 && attention >= averageAttention+20) {
+			triggerMusic();
+			recentAttentionLvl = new ArrayList<>();
+		} else if (length >= 6) {
+			recentAttentionLvl.remove(0);
+		}
+		for (int i : recentAttentionLvl) { sum += i; }
+		averageAttention = sum/length;
+	}
+
+	private void triggerMusic() {
+		if (musicSrv.isPng()){
+			musicSrv.pausePlayer();
+			track_play_pause.setImageResource(R.drawable.ic_play);
+		} else {
+			musicSrv.playSong(currentSong);
+			track_play_pause.setImageResource(R.drawable.ic_pause);
+		}
+	}
+
 
 	public void showToast(final String msg,final int timeStyle){
 		this.runOnUiThread(new Runnable()
@@ -451,153 +442,17 @@ public class BluetoothDeviceDemoActivity extends AppCompatActivity {
 
 		});
 	}
-	
-	//show device list while scanning
-	private ListView list_select;
-	private BTDeviceListAdapter deviceListApapter = null;
-	private Dialog selectDialog;
-	
-	// (3) Demo of getting Bluetooth device dynamically
-    public void scanDevice(){
 
-    	if(mBluetoothAdapter.isDiscovering()){
-    		mBluetoothAdapter.cancelDiscovery();
-    	}
-    	
-    	setUpDeviceListView();
-    	//register the receiver for scanning
-		IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-		this.registerReceiver(mReceiver, filter);
-    	
-    	mBluetoothAdapter.startDiscovery();
-    }
-    
- private void setUpDeviceListView(){
-    	
-    	LayoutInflater inflater = LayoutInflater.from(this);
-		View view = inflater.inflate(R.layout.dialog_select_device, null);
-		list_select = (ListView) view.findViewById(R.id.list_select);
-		selectDialog = new Dialog(this);
-		selectDialog.setContentView(view);
-    	//List device dialog
-
-    	deviceListApapter = new BTDeviceListAdapter(this);
-    	list_select.setAdapter(deviceListApapter);
-    	list_select.setOnItemClickListener(selectDeviceItemClickListener);
-    	
-    	selectDialog.setOnCancelListener(new OnCancelListener(){
-
-			@Override
-			public void onCancel(DialogInterface arg0) {
-				// TODO Auto-generated method stub
-				Log.e(TAG,"onCancel called!");
-				BluetoothDeviceDemoActivity.this.unregisterReceiver(mReceiver);
-			}
-    		
-    	});
-    	
-    	selectDialog.show();
-    	
-    	Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-    	for(BluetoothDevice device: pairedDevices){
-    		deviceListApapter.addDevice(device);
-    	}
-		deviceListApapter.notifyDataSetChanged();
-    }
- 
- //Select device operation
- private OnItemClickListener selectDeviceItemClickListener = new OnItemClickListener(){
-	 
-		@Override
-		public void onItemClick(AdapterView<?> arg0, View arg1,int arg2, long arg3) {
-			// TODO Auto-generated method stub
-			Log.d(TAG, "Rico ####  list_select onItemClick     ");
-	    	if(mBluetoothAdapter.isDiscovering()){
-	    		mBluetoothAdapter.cancelDiscovery();
-	    	}
-	    	//unregister receiver
-	    	BluetoothDeviceDemoActivity.this.unregisterReceiver(mReceiver);
-
-	    	mBluetoothDevice =deviceListApapter.getDevice(arg2);
-	    	selectDialog.dismiss();
-	    	selectDialog = null;
-	    	
-			Log.d(TAG,"onItemClick name: "+mBluetoothDevice.getName() + " , address: " + mBluetoothDevice.getAddress() );
-			address = mBluetoothDevice.getAddress().toString();
-			
-			//ger remote device
-			BluetoothDevice remoteDevice = mBluetoothAdapter.getRemoteDevice(mBluetoothDevice.getAddress().toString());
-         
-			//bind and connect
-			//bindToDevice(remoteDevice); // create bond works unstable on Samsung S5
-			//showToast("pairing ...",Toast.LENGTH_SHORT);
-
-			tgStreamReader = createStreamReader(remoteDevice); 
-			tgStreamReader.connectAndStart();
-		
-		}
-	
- };
-
-	public TgStreamReader createStreamReader(BluetoothDevice bd){
+	public TgStreamReader createStreamReader(BluetoothAdapter bd){
 
 		if(tgStreamReader == null){
-			// Example of constructor public TgStreamReader(BluetoothDevice mBluetoothDevice,TgStreamHandler tgStreamHandler)
 			tgStreamReader = new TgStreamReader(bd,callback);
 			tgStreamReader.startLog();
 		}else{
-			// (1) Demo of changeBluetoothDevice
-			tgStreamReader.changeBluetoothDevice(bd);
-			
-			// (4) Demo of setTgStreamHandler, you can change the data handler by this function
 			tgStreamReader.setTgStreamHandler(callback);
 		}
 		return tgStreamReader;
 	}
-
- 	public void bindToDevice(BluetoothDevice bd){
- 	    int ispaired = 0;
-		if(bd.getBondState() != BluetoothDevice.BOND_BONDED){
-			//ispaired = remoteDevice.createBond();
-			try {
-				//Set pin
-				if(Utils.autoBond(bd.getClass(), bd, "0000")){
-					ispaired += 1;
-				}
-				//bind to device
-				if(Utils.createBond(bd.getClass(), bd)){
-					ispaired += 2;
-				}
-				Method createCancelMethod=BluetoothDevice.class.getMethod("cancelBondProcess");
-                boolean bool=(Boolean)createCancelMethod.invoke(bd);
-                Log.d(TAG,"bool="+bool);
-					
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				Log.d(TAG, " paire device Exception:    " + e.toString());	
-			}
-		}
-		Log.d(TAG, " ispaired:    " + ispaired);	
-
- }
-
-	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			String action = intent.getAction();
-				Log.d(TAG, "mReceiver()");
-			// When discovery finds a device
-			if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-				// Get the BluetoothDevice object from the Intent
-				BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-				Log.d(TAG,"mReceiver found device: " + device.getName());
-				
-				// update to UI
-				deviceListApapter.addDevice(device);
-				deviceListApapter.notifyDataSetChanged();
-			} 
-		}
-	};
 
 	public void getSongList() {
 		songList = new ArrayList<Song>();
