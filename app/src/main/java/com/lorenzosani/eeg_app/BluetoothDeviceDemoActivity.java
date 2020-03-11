@@ -204,6 +204,7 @@ public class BluetoothDeviceDemoActivity extends AppCompatActivity {
 	
 	private void start(){
 			createStreamReader(mBluetoothAdapter);
+            tgStreamReader.setGetDataTimeOutTime(10);
 			tgStreamReader.connectAndStart();
 	}
 
@@ -261,21 +262,17 @@ public class BluetoothDeviceDemoActivity extends AppCompatActivity {
 			currentState  = connectionStates;
 			switch (connectionStates) {
 			case ConnectionStates.STATE_CONNECTED:
-				//sensor.start();
+                tgStreamReader.startRecordRawData();
 				showToast("Connected", Toast.LENGTH_SHORT);
 				break;
 			case ConnectionStates.STATE_WORKING:
 				LinkDetectedHandler.sendEmptyMessageDelayed(1234, 5000);
 				break;
 			case ConnectionStates.STATE_GET_DATA_TIME_OUT:
-				showToast("No data received", Toast.LENGTH_SHORT);
-				break;
-			case ConnectionStates.STATE_COMPLETE:
-				//read file complete
-				break;
-			case ConnectionStates.STATE_STOPPED:
-				break;
-			case ConnectionStates.STATE_DISCONNECTED:
+                tgStreamReader.stopRecordRawData();
+				showToast("No data received. Retrying...", Toast.LENGTH_SHORT);
+				stop();
+				start();
 				break;
 			case ConnectionStates.STATE_ERROR:
 				Log.d(TAG,"Connect error, Please try again!");
@@ -288,8 +285,6 @@ public class BluetoothDeviceDemoActivity extends AppCompatActivity {
 			msg.what = MSG_UPDATE_STATE;
 			msg.arg1 = connectionStates;
 			LinkDetectedHandler.sendMessage(msg);
-			
-
 		}
 
 		@Override
