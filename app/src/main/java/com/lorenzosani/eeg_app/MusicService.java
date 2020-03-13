@@ -55,6 +55,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     }
 
     public boolean isPng(){
+        if (player != null) {
+            return player.isPlaying();
+        }
+        initMusicPlayer();
         return player.isPlaying();
     }
 
@@ -82,6 +86,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public boolean onUnbind(Intent intent){
         player.stop();
         player.release();
+        player = null;
         return false;
     }
 

@@ -67,17 +67,14 @@ public class DrawWaveView extends View {
 		
 		mPixPerHeight = (float)mHeight/(maxValue  - minValue);
 		mPixPerWidth =  (float)mWidth/maxPoint ;
-		
-//		Log.d(TAG,"initView  mWidth= " + mWidth + " , mHeight= " + mHeight  );
-//		Log.d(TAG,"initView  mBottom= " + mBottom + " , mLeft= " + mLeft  );
-//		Log.d(TAG,"initView  mPixPerHeight= "+ mPixPerHeight +" ,mPixPerWidth=" +mPixPerWidth);
+
 		cacheBitmap = Bitmap.createBitmap(mWidth, mHeight, Config.ARGB_8888);
 		cacheCanvas = new Canvas();
 		path = new Path();
 		cacheCanvas.setBitmap(cacheBitmap);
 		
 		paint = new Paint(Paint.DITHER_FLAG);
-		paint.setColor(Color.parseColor("#449C64"));
+		paint.setColor(getResources().getColor(R.color.primary));
 		paint.setStyle(Paint.Style.STROKE);
 		paint.setStrokeWidth(4);
 		

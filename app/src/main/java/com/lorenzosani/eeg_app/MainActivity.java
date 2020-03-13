@@ -1,13 +1,12 @@
 package com.lorenzosani.eeg_app;
 
-
 import com.neurosky.connection.TgStreamReader;
 
 import android.Manifest;
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -15,18 +14,14 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-/**
- * This activity is the man entry of this app. It demonstrates the usage of 
- * (1) TgStreamReader.redirectConsoleLogToDocumentFolder()
- * (2) TgStreamReader.stopConsoleLog()
- * (3) demo of getVersion
- */
-public class DemoActivity extends Activity {
-	private static final String TAG = DemoActivity.class.getSimpleName();
+public class MainActivity extends Activity {
+	private static final String TAG = MainActivity.class.getSimpleName();
+	private BluetoothAdapter mBluetoothAdapter;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -36,61 +31,54 @@ public class DemoActivity extends Activity {
 		setContentView(R.layout.main_view);
 
 		initView();
-
 		TgStreamReader.redirectConsoleLogToDocumentFolder();
 
-		Log.d(TAG,"lib version: " + TgStreamReader.getVersion());
-
 		// Ask permission to read storage to get available songs
-		if (ContextCompat.checkSelfPermission(DemoActivity.this,
+		if (ContextCompat.checkSelfPermission(MainActivity.this,
 				Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-			if (ActivityCompat.shouldShowRequestPermissionRationale(DemoActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-				ActivityCompat.requestPermissions(DemoActivity.this,
+			if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+				ActivityCompat.requestPermissions(MainActivity.this,
 						new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-
 			} else {
-				ActivityCompat.requestPermissions(DemoActivity.this,
+				ActivityCompat.requestPermissions(MainActivity.this,
 						new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-
 			}
 		}
 	}
 
-	private Button btn_device = null;
-
 	private void initView() {
-		btn_device = (Button) findViewById(R.id.btn_device);
-
+		Button btn_device = (Button) findViewById(R.id.btn_device);
 		btn_device.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
-				Intent intent = new Intent(DemoActivity.this,BluetoothDeviceDemoActivity.class);
-				Log.d(TAG,"Start the BluetoothDeviceDemoActivity");
-				startActivity(intent);
+			try {
+				mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+				if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
+					Toast.makeText(getApplicationContext(), "Please enable your Bluetooth!", Toast.LENGTH_LONG).show();
+				} else{
+					Intent intent = new Intent(MainActivity.this, MusicControlActivity.class);
+					Log.d(TAG,"Start the BluetoothDeviceDemoActivity");
+					startActivity(intent);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				Log.i(TAG, "error:" + e.getMessage());
+			}
 			}
 		});
 	}
 
-
-
 	@Override
 	protected void onDestroy() {
-		
-		// (2) Example of stopConsoleLog()
 		TgStreamReader.stopConsoleLog();
 		super.onDestroy();
 	}
 
 	@Override
-	protected void onStart() {
-		super.onStart();
-	}
+	protected void onStart() { super.onStart();	}
 
 	@Override
-	protected void onStop() {
-		// TODO Auto-generated method stub
-		super.onStop();
-	}
+	protected void onStop() { super.onStop(); }
 
 }

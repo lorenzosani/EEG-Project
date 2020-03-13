@@ -12,7 +12,7 @@
         android:label="Mind-Controlled Music Player"
         android:theme="@style/Theme.AppCompat" >
         <activity
-            android:name="com.lorenzosani.eeg_app.DemoActivity"
+            android:name="com.lorenzosani.eeg_app.MainActivity"
             android:screenOrientation="portrait"
             android:label="@string/app_name" >
             <intent-filter>
@@ -21,7 +21,7 @@
             </intent-filter>
         </activity>
         <activity
-             android:name="com.lorenzosani.eeg_app.BluetoothDeviceDemoActivity"
+             android:name="com.lorenzosani.eeg_app.MusicControlActivity"
              android:screenOrientation="portrait"
              android:theme="@style/fullscreen"/>
         <service android:name=".MusicService"/>

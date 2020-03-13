@@ -1,5 +1,4 @@
 <resources>
-
     <string name="app_name">Mind-Controlled Music Player</string>
-
+    <string name="welcome">Ready to control music with your mind?</string>
 </resources>

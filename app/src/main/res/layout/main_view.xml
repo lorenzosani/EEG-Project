@@ -26,42 +26,55 @@
         android:padding="48dp">
 
         <TextView
-            android:id="@+id/welcome"
+            android:id="@+id/welcome_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:capitalize="characters"
             android:lineSpacingExtra="4sp"
-            android:text="Hey! Ready to control music with your mind?"
+            android:text="@string/welcome"
             android:textAlignment="textStart"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-            android:textColor="#449C64"
+            android:textColor="@color/primary"
             android:textSize="32dp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/welcome2"
+            android:id="@+id/welcome_1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/welcome"
+            android:layout_below="@id/welcome_title"
             android:layout_marginTop="32dp"
             android:layout_marginBottom="16dp"
             android:capitalize="characters"
-            android:text="1. Turn on your Bluetooth"
+            android:text="1. Turn on the Bluetooth"
             android:textAlignment="textStart"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             android:textColor="#CFFFFFFF"
             android:textSize="16dp" />
 
         <TextView
-            android:id="@+id/welcome3"
+            android:id="@+id/welcome_2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/welcome2"
+            android:layout_below="@id/welcome_1"
+            android:layout_marginBottom="16dp"
+            android:capitalize="characters"
+            android:text="2. Turn on your Headset"
+            android:textAlignment="textStart"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:textColor="#CFFFFFFF"
+            android:textSize="16dp" />
+
+        <TextView
+            android:id="@+id/welcome_3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/welcome_2"
             android:layout_marginBottom="16dp"
             android:capitalize="characters"
             android:lineSpacingExtra="4sp"
-            android:text='2. Press "Get Started" when ready'
+            android:text='3. Press "Get Started" when ready!'
             android:textAlignment="textStart"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             android:textColor="#CFFFFFFF"
@@ -91,7 +104,7 @@
                 android:background="@drawable/btn_bg"
                 android:text="GET STARTED"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:textColor="#E6FFFFFF"
+                android:textColor="@color/dark_gray"
                 android:textSize="18dp"
                 android:textStyle="bold" />
 
