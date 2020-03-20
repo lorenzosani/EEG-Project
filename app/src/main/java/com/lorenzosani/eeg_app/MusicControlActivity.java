@@ -40,14 +40,26 @@ public class MusicControlActivity extends AppCompatActivity {
 	private static final String TAG = MusicControlActivity.class.getSimpleName();
 	private TgStreamReader tgStreamReader;
 	private BluetoothAdapter mBluetoothAdapter;
+	private ConcentrationLevel concentrationLevel = new ConcentrationLevel();
 	private ArrayList<Song> songList;
 	private int currentSong = 0;
 	private MusicService musicSrv;
 	private Intent playIntent;
 	private boolean musicBound = false;
-	private ArrayList<Integer> recentAttentionLvl = new ArrayList<>();
-	private int averageAttention;
-	private boolean mindControlEnabled = false;
+	private int badPacketCount = 0;
+
+	private TextView track_title;
+	private ImageView track_previous;
+	private ImageView track_play_pause;
+	private ImageView track_next;
+	private TextView tv_lowalpha = null;
+	private TextView  tv_highalpha = null;
+	private TextView  tv_lowbeta = null;
+	private TextView  tv_highbeta = null;
+	private Button btn_selectdevice = null;
+	private LinearLayout wave_layout;
+	private TextView status_text;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +88,7 @@ public class MusicControlActivity extends AppCompatActivity {
 			Log.i(TAG, "error:" + e.getMessage());
 			return;
 		}
-
+		concentrationLevel.secondsToAverage = 6;
         badPacketCount = 0;
         start();
 	}
@@ -96,29 +108,11 @@ public class MusicControlActivity extends AppCompatActivity {
 		}
 	};
 
-	private TextView track_title;
-	private ImageView track_previous;
-	private ImageView track_play_pause;
-	private ImageView track_next;
-	private TextView tv_attention = null;
-	private TextView tv_meditation = null;
-	private TextView tv_lowalpha = null;
-	private TextView  tv_highalpha = null;
-	private TextView  tv_lowbeta = null;
-	private TextView  tv_highbeta = null;
-	private Button btn_selectdevice = null;
-	private LinearLayout wave_layout;
-	private TextView status_text;
-	
-	private int badPacketCount = 0;
-
 	private void initView() {
 		track_title = (TextView) findViewById(R.id.track_title);
 		track_previous = (ImageView) findViewById(R.id.track_previous);
 		track_play_pause = (ImageView) findViewById(R.id.track_play_pause);
 		track_next = (ImageView) findViewById(R.id.track_next);
-		tv_attention = (TextView) findViewById(R.id.tv_attention);
-		tv_meditation = (TextView) findViewById(R.id.tv_meditation);
 		tv_lowalpha = (TextView) findViewById(R.id.tv_lowalpha);
 		tv_highalpha = (TextView) findViewById(R.id.tv_highalpha);
 		tv_lowbeta= (TextView) findViewById(R.id.tv_lowbeta);
@@ -164,12 +158,12 @@ public class MusicControlActivity extends AppCompatActivity {
 
 			@Override
 			public void onClick(View arg0) {
-				if( mindControlEnabled ) {
+				if( !concentrationLevel.mindControlEnabled ) {
 					btn_selectdevice.setText("Disable Mind Control");
 				} else {
 					btn_selectdevice.setText("Enable Mind Control");
 				}
-                mindControlEnabled = !mindControlEnabled;
+                concentrationLevel.mindControlEnabled = !concentrationLevel.mindControlEnabled;
 			}
 
 		});
@@ -188,7 +182,7 @@ public class MusicControlActivity extends AppCompatActivity {
 	public void stop() {
 		if(tgStreamReader != null){
 			tgStreamReader.stop();
-			tgStreamReader.close();//if there is not stop cmd, please call close() or the data will accumulate 
+			tgStreamReader.close();
 			tgStreamReader = null;
 		}
 	}
@@ -338,12 +332,19 @@ public class MusicControlActivity extends AppCompatActivity {
 				break;
 			case MindDataType.CODE_MEDITATION:
 				Log.d(TAG, "HeadDataType.CODE_MEDITATION " + msg.arg1);
-				tv_meditation.setText("" +msg.arg1 );
+				concentrationLevel.newMeditation(msg.arg1);
+				setConnectionStatus();
+				if (concentrationLevel.isTrigger){
+					triggerMusic();
+				}
 				break;
 			case MindDataType.CODE_ATTENTION:
 				Log.d(TAG, "CODE_ATTENTION " + msg.arg1);
-				tv_attention.setText("" +msg.arg1 );
-				updateAverageAttention(msg.arg1);
+				concentrationLevel.newAttention(msg.arg1);
+				setConnectionStatus();
+				if (concentrationLevel.isTrigger){
+					triggerMusic();
+				}
 				break;
 			case MindDataType.CODE_EEGPOWER:
 				EEGPower power = (EEGPower)msg.obj;
@@ -368,33 +369,8 @@ public class MusicControlActivity extends AppCompatActivity {
 		}
 	};
 
-	private void updateAverageAttention(int attention) {
-        if (attention == 0){
-            status_text.setText("Poor Signal");
-            status_text.setTextColor(getResources().getColor(R.color.red));
-            return;
-        }
-        status_text.setText("Connected");
-        status_text.setTextColor(getResources().getColor(R.color.primary));
-        if (mindControlEnabled) {
-            recentAttentionLvl.add(attention);
-            int length = recentAttentionLvl.size();
-            int sum = 0;
-
-            if (length >= 6 && attention >= averageAttention + 20) {
-                triggerMusic();
-                recentAttentionLvl = new ArrayList<>();
-            } else if (length >= 6) {
-                recentAttentionLvl.remove(0);
-            }
-            for (int i : recentAttentionLvl) {
-                sum += i;
-            }
-            averageAttention = sum / length;
-        }
-	}
-
 	private void triggerMusic() {
+		concentrationLevel.isTrigger = false;
 		if (musicSrv.isPng()){
 			musicSrv.pausePlayer();
 			track_play_pause.setImageResource(R.drawable.ic_play);
@@ -405,7 +381,7 @@ public class MusicControlActivity extends AppCompatActivity {
 	}
 
 	public void createStreamReader(BluetoothAdapter bd){
-        tgStreamReader = new TgStreamReader(bd,callback);
+        tgStreamReader = new TgStreamReader(bd, callback);
         tgStreamReader.startLog();
 	}
 
@@ -451,5 +427,15 @@ public class MusicControlActivity extends AppCompatActivity {
 		track_title.setText(s.getTitle() + " by " + s.getArtist());
 		musicSrv.playSong(currentSong);
 		track_play_pause.setImageResource(R.drawable.ic_pause);
+	}
+
+	public void setConnectionStatus() {
+		if (concentrationLevel.isPoorQuality) {
+			status_text.setText("Poor Signal");
+			status_text.setTextColor(getResources().getColor(R.color.red));
+			return;
+		}
+		status_text.setText("Connected");
+		status_text.setTextColor(getResources().getColor(R.color.primary));
 	}
 }
