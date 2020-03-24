@@ -47,6 +47,7 @@ public class MusicControlActivity extends AppCompatActivity {
 	private Intent playIntent;
 	private boolean musicBound = false;
 	private int badPacketCount = 0;
+	private boolean isFocused = false;
 
 	private TextView track_title;
 	private ImageView track_previous;
@@ -158,6 +159,7 @@ public class MusicControlActivity extends AppCompatActivity {
 
 			@Override
 			public void onClick(View arg0) {
+				isFocused = !isFocused;
 				if( !concentrationLevel.mindControlEnabled ) {
 					btn_selectdevice.setText("Disable Mind Control");
 				} else {
@@ -353,6 +355,9 @@ public class MusicControlActivity extends AppCompatActivity {
 					tv_highalpha.setText("" +power.highAlpha);
 					tv_lowbeta.setText("" +power.lowBeta);
 					tv_highbeta.setText("" +power.highBeta);
+					concentrationLevel.newAlpha(power.highAlpha);
+					concentrationLevel.newBeta(power.highBeta);
+					//getAverages(power);
 				}
 				break;
 			case MindDataType.CODE_POOR_SIGNAL://
@@ -368,7 +373,67 @@ public class MusicControlActivity extends AppCompatActivity {
 			super.handleMessage(msg);
 		}
 	};
+/*
+	// THIS CALCULATES THE AVERAGE FOR ANY TYPE OF WAVE
+	private int LAavg;
+	private int HAavg;
+	private int LBavg;
+	private int HBavg;
+	private int LAavgF;
+	private int HAavgF;
+	private int LBavgF;
+	private int HBavgF;
+	private ArrayList<Integer> LA = new ArrayList<>();
+	private ArrayList<Integer> HA = new ArrayList<>();
+	private ArrayList<Integer> LB = new ArrayList<>();
+	private ArrayList<Integer> HB = new ArrayList<>();
+	private ArrayList<Integer> LAF = new ArrayList<>();
+	private ArrayList<Integer> HAF = new ArrayList<>();
+	private ArrayList<Integer> LBF = new ArrayList<>();
+	private ArrayList<Integer> HBF = new ArrayList<>();
 
+	private void getAverages(EEGPower data) {
+		if (isFocused) {
+			LAF.add(data.lowAlpha);
+			HAF.add(data.highAlpha);
+			LBF.add(data.lowBeta);
+			HBF.add(data.lowAlpha);
+			int LAsum = 0;
+			int HAsum = 0;
+			int LBsum = 0;
+			int HBsum = 0;
+			for(int i=0; i<LAF.size(); i++){
+				LAsum += LAF.get(i);
+				HAsum += HAF.get(i);
+				LBsum += LBF.get(i);
+				HBsum += HBF.get(i);
+			}
+			Log.d(TAG, "LAF: " + LAsum/LAF.size());
+			Log.d(TAG, "HAF: " + HAsum/HAF.size());
+			Log.d(TAG, "LBF: " + LBsum/LBF.size());
+			Log.d(TAG, "HBF: " + HBsum/HBF.size());
+		} else {
+			LA.add(data.lowAlpha);
+			HA.add(data.highAlpha);
+			LB.add(data.lowBeta);
+			HB.add(data.lowAlpha);
+			int LAsum = 0;
+			int HAsum = 0;
+			int LBsum = 0;
+			int HBsum = 0;
+			for(int i=0; i<LA.size(); i++){
+				LAsum += LA.get(i);
+				HAsum += HA.get(i);
+				LBsum += LB.get(i);
+				HBsum += HB.get(i);
+			}
+			Log.d(TAG, "LA: " + LAsum/LA.size());
+			Log.d(TAG, "HA: " + HAsum/HA.size());
+			Log.d(TAG, "LB: " + LBsum/LB.size());
+			Log.d(TAG, "HB: " + HBsum/HB.size());
+		}
+	}
+*/
 	private void triggerMusic() {
 		concentrationLevel.isTrigger = false;
 		if (musicSrv.isPng()){

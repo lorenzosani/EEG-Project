@@ -40,7 +40,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             paused = false;
             return;
         }
-        player.reset();
+        if (player != null) {
+            player.reset();
+        }
         Song playSong = songs.get(i);
         currentSong = i;
         long currSong = playSong.getID();

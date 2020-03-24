@@ -1,17 +1,27 @@
 package com.lorenzosani.eeg_app;
 
-import android.util.Log;
-
 import java.util.ArrayList;
-import java.util.stream.IntStream;
 
 public class ConcentrationLevel{
     private static final String TAG = MusicControlActivity.class.getSimpleName();
 
+    /*
+    * AVERAGE WAVES VALUES - FOCUSED:
+    * lowAlpha: 28000
+    * highAlpha: 23000
+    * lowBeta: 18000
+    * highBeta: 28000
+    * AVERAGE WAVES VALUES - RELAXED:
+    * lowAlpha: 24000
+    * highAlpha: 39000
+    * lowBeta: 19000
+    * highBeta: 21000
+    * */
+
     private ArrayList<Integer> attentionData = new ArrayList<>();
     private ArrayList<Integer> meditationData = new ArrayList<>();
-    private ArrayList<Integer> recentBetaWaves = new ArrayList<>();
-    private ArrayList<Integer> recentAlphaWaves = new ArrayList<>();
+    private ArrayList<Integer> betaData = new ArrayList<>();
+    private ArrayList<Integer> alphaData = new ArrayList<>();
     private int averageAttention;
     private int averageMeditation;
     private int averageBeta;
@@ -60,11 +70,27 @@ public class ConcentrationLevel{
     }
 
     void newBeta(int data) {
-
+        if (mindControlEnabled) {
+            lastBeta = data;
+            betaData.add(data);
+            if (betaData.size() > secondsToAverage) {
+                betaData.remove(0);
+                triggerMusic();
+            }
+            averageBeta = getAverage(betaData);
+        }
     }
 
     void newAlpha(int data) {
-
+        if (mindControlEnabled) {
+            lastAlpha = data;
+            alphaData.add(data);
+            if (alphaData.size() > secondsToAverage) {
+                alphaData.remove(0);
+                triggerMusic();
+            }
+            averageAlpha = getAverage(alphaData);
+        }
     }
 
     private boolean isPoorQuality(int data) {
@@ -88,7 +114,7 @@ public class ConcentrationLevel{
     }
 
     private boolean isTrigger() {
-        return lastAttention > averageAttention && lastMeditation < averageMeditation;
+        return lastBeta > averageBeta+1000 && lastAlpha < averageAlpha-1000 && lastBeta>lastAlpha;
     }
 
     private int getAverage(ArrayList<Integer> list) {
